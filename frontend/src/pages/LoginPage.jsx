@@ -35,10 +35,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md rounded-2xl border border-slate-100 bg-white p-8 shadow-card">
-        <h1 className="text-2xl font-bold">Welcome Back</h1>
-        <p className="mt-1.5 text-sm text-slate-600">
+    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center px-4 py-12 bg-surface paper-grain">
+      <div className="dossier-card w-full max-w-md p-8">
+        <h1 className="font-headline text-3xl font-bold text-ink-900">Welcome Back</h1>
+        <p className="mt-1.5 text-sm text-on-surface-variant font-medium">
           Login to continue simulating your startup ideas.
         </p>
 
@@ -69,15 +69,15 @@ export default function LoginPage() {
               },
             })}
           />
-          <Button type="submit" fullWidth loading={loading}>
+          <Button type="submit" fullWidth loading={loading} className="mt-2">
             <Mail size={16} />
             Login
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-600">
+        <p className="mt-6 text-center text-sm text-on-surface-variant">
           Don&apos;t have an account?{" "}
-          <Link to="/signup" className="font-semibold text-primary-600 hover:underline">
+          <Link to="/signup" className="font-semibold text-brass-700 hover:text-brass-600 transition-colors">
             Sign up
           </Link>
         </p>

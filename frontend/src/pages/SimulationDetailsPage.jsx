@@ -1,105 +1,86 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   Building2,
-  Target,
-  TrendingUp,
-  Wallet,
-  ShieldAlert,
-  Lightbulb,
   Gauge,
-  CheckCircle2,
-  XCircle,
-  Landmark,
+  Sliders,
+  RefreshCw,
+  TrendingUp,
+  DollarSign,
+  Calendar,
+  Layers,
+  ShieldCheck,
+  AlertTriangle,
+  Award,
 } from "lucide-react";
+import toast from "react-hot-toast";
 import Skeleton from "../components/ui/Skeleton.jsx";
 import ErrorState from "../components/ui/ErrorState.jsx";
 import Badge from "../components/ui/Badge.jsx";
-import SectionCard from "../components/ui/SectionCard.jsx";
-import simulationService from "../services/simulationService.js";
-
-const scoreTone = (score) =>
-  score >= 75 ? "green" : score >= 50 ? "yellow" : "red";
-
-const recommendation = (score) =>
-  score >= 80
-    ? [
-        "Strong Investment Candidate",
-        "green",
-        "This startup shows strong fundamentals and is well-positioned to attract investor interest.",
-      ]
-    : score >= 55
-      ? [
-          "Promising with Reservations",
-          "yellow",
-          "This startup has potential but should address key risks and weaknesses before pursuing funding.",
-        ]
-      : [
-          "Needs Significant Refinement",
-          "red",
-          "This startup requires substantial validation and refinement before it is investment-ready.",
-        ];
-
-function Info({ label, value }) {
-  return (
-    <div>
-      <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-        {label}
-      </p>
-      <p className="mt-1 whitespace-pre-line text-sm text-slate-700">
-        {value || "—"}
-      </p>
-    </div>
-  );
-}
-
-function List({ items, emptyText }) {
-  return Array.isArray(items) && items.length ? (
-    <ul className="space-y-2">
-      {items.map((item, index) => (
-        <li key={index} className="flex gap-2 text-sm text-slate-600">
-          <i className="mt-2 h-1.5 w-1.5 rounded-full bg-slate-300" />
-          {item}
-        </li>
-      ))}
-    </ul>
-  ) : (
-    <p className="text-sm text-slate-400">{emptyText}</p>
-  );
-}
+import Button from "../components/ui/Button.jsx";
+import useSimulationDashboard from "../hooks/useSimulationDashboard.js";
+import LegacySimulationDetails from "../components/simulation/LegacySimulationDetails.jsx";
+import ScenarioToggle from "../components/simulation/ScenarioToggle.jsx";
+import TimelineScrubber from "../components/simulation/TimelineScrubber.jsx";
+import MonthSnapshot from "../components/simulation/MonthSnapshot.jsx";
+import SimulationCharts from "../components/simulation/SimulationCharts.jsx";
+import WarningsBanner from "../components/simulation/WarningsBanner.jsx";
+import AssumptionsPanel from "../components/simulation/AssumptionsPanel.jsx";
+import StartupScorerDashboard from "../components/simulation/StartupScorerDashboard.jsx";
 
 export default function SimulationDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [simulation, setSimulation] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    simulation,
+    loading,
+    error,
+    rerunning,
+    isLegacy,
+    activeScenario,
+    setActiveScenario,
+    selectedMonth,
+    setSelectedMonth,
+    currentScenarioData,
+    selectedMonthData,
+    summary,
+    warnings,
+    assumptions,
+    handleRerun,
+    refetch,
+  } = useSimulationDashboard(id);
 
-  const fetchSimulation = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      setSimulation((await simulationService.getSimulationById(id)).data);
-    } catch (e) {
-      setError(
-        !e?.response ? "network" : e.response.status === 401 ? "unauthorized" : "default"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showAssumptions, setShowAssumptions] = useState(false);
+  const [editedAssumptions, setEditedAssumptions] = useState(null);
+  const [activeTab, setActiveTab] = useState("scorer");
 
+  // Sync edited assumptions when loaded
   useEffect(() => {
-    fetchSimulation();
-  }, [id]);
+    if (assumptions && !editedAssumptions) {
+      setEditedAssumptions(JSON.parse(JSON.stringify(assumptions)));
+    }
+  }, [assumptions, editedAssumptions]);
+
+  // Handle timeline play animation
+  useEffect(() => {
+    let timer = null;
+    if (isPlaying) {
+      timer = setInterval(() => {
+        setSelectedMonth((prev) => (prev >= 12 ? 1 : prev + 1));
+      }, 1200);
+    }
+    return () => clearInterval(timer);
+  }, [isPlaying, setSelectedMonth]);
 
   if (loading) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-10 w-40" />
-        <Skeleton className="h-40 w-full" />
-        <Skeleton className="h-52 w-full" />
+        <Skeleton className="h-36 w-full" />
+        <Skeleton className="h-28 w-full" />
+        <Skeleton className="h-96 w-full" />
       </div>
     );
   }
@@ -107,128 +88,316 @@ export default function SimulationDetailsPage() {
   if (error || !simulation) {
     return (
       <ErrorState
-        type={error}
-        title={error === "default" ? "Simulation Not Found" : undefined}
-        onRetry={fetchSimulation}
+        type={error === "network" ? "network" : "default"}
+        title={error === "default" ? "Simulation Not Found" : "Error Loading Simulation"}
+        onRetry={refetch}
       />
     );
   }
 
-  const a = simulation.analysis || {};
-  const [label, tone, text] = recommendation(a.startupScore || 0);
+  // Preserve legacy V1 simulations exactly as they were
+  if (isLegacy) {
+    return <LegacySimulationDetails simulation={simulation} />;
+  }
+
+  const formatCurrency = (val) => {
+    if (val === undefined || val === null) return "$0";
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
+    }).format(val);
+  };
+
+  const handleApplyAssumptions = async () => {
+    if (!editedAssumptions) return;
+    try {
+      await handleRerun(editedAssumptions);
+      toast.success("Simulation re-calculated successfully with updated assumptions!");
+      setShowAssumptions(false);
+    } catch (err) {
+      toast.error(err.message || "Failed to re-run simulation");
+    }
+  };
+
+  const monthlyList = currentScenarioData?.monthlySimulation || [];
+  const isExhausted = summary?.cashExhaustedMonth !== null && summary?.cashExhaustedMonth !== undefined;
+
+  const scoreVal = simulation.score?.overallScore ?? simulation.startupScore ?? simulation.analysis?.startupScore ?? 0;
+  const scoreClassification = simulation.score?.classification || (scoreVal >= 80 ? "Strong Investment Candidate" : scoreVal >= 55 ? "Promising" : "Needs Refinement");
+  const scoreTone = scoreVal >= 80 ? "green" : scoreVal >= 65 ? "blue" : scoreVal >= 50 ? "yellow" : "red";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-12">
       <button
         onClick={() => navigate("/simulations")}
-        className="flex items-center gap-1.5 text-sm text-slate-500"
+        className="flex items-center gap-1.5 text-sm font-semibold text-brass-700 hover:text-brass-600 transition-colors"
       >
         <ArrowLeft size={16} />
-        Back to My Simulations
+        <span>Back to My Simulations</span>
       </button>
 
-      {/* Header */}
-      <div className="flex flex-col justify-between gap-6 rounded-2xl border bg-white p-6 shadow-card sm:flex-row sm:items-center">
+      {/* V2 Header Dossier */}
+      <div className="dossier-card p-6 paper-grain flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-          <div className="flex gap-3">
-            <h1 className="text-2xl font-bold">{simulation.startupName}</h1>
-            <Badge tone="blue">{simulation.industry}</Badge>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="font-headline text-3xl font-bold text-ink-900">{simulation.startupName}</h1>
+            {simulation.industry && <Badge tone="blue">{simulation.industry}</Badge>}
+            <span className="bg-brass-100 text-brass-900 border border-brass-400 text-[0.7rem] px-2.5 py-0.5 rounded-full font-data font-bold tracking-wide uppercase">
+              V2 Deterministic Model
+            </span>
           </div>
-          <p className="mt-2 text-sm text-slate-500">
-            Simulated on {new Date(simulation.createdAt).toLocaleDateString()}
+          <p className="mt-2 text-sm text-on-surface-variant flex items-center gap-2">
+            <Calendar size={14} className="text-ink-500" />
+            <span>Simulated on {new Date(simulation.createdAt).toLocaleDateString()}</span>
+            <span>•</span>
+            <span>12-Month Assumption-Driven Growth Engine</span>
           </p>
         </div>
-        <div className="rounded-2xl bg-slate-50 px-6 py-4 text-center">
-          <span className="flex items-center gap-2 text-xs text-slate-500">
-            <Gauge size={16} />
-            AI Score
-          </span>
-          <p className="text-3xl font-bold">{a.startupScore ?? 0}/100</p>
-          <Badge tone={scoreTone(a.startupScore || 0)}>{label}</Badge>
-        </div>
-      </div>
 
-      {/* Startup Overview */}
-      <SectionCard icon={Building2} title="Startup Overview">
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Info label="Problem Statement" value={simulation.problemStatement} />
-          <Info label="Idea / Solution Details" value={simulation.idea} />
-          <Info label="Target Audience" value={simulation.targetAudience} />
-          <Info label="Business Model" value={simulation.businessModel} />
-          <Info label="Funding Required" value={simulation.pricing} />
-          <Info label="Unique Selling Proposition" value={simulation.uniqueSellingProposition} />
-        </div>
-      </SectionCard>
-
-      {/* Market & Revenue */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <SectionCard icon={Target} title="Market Potential">
-          <p className="text-sm text-slate-600">{a.marketPotential}</p>
-        </SectionCard>
-        <SectionCard icon={Wallet} title="Revenue Prediction" tone="green">
-          <div className="space-y-4">
-            <Info label="Revenue Prediction" value={a.revenuePrediction} />
-            <Info label="Growth Prediction" value={a.growthPrediction} />
-            <Info label="Cash Flow Outlook" value={a.cashFlow} />
+        {/* Action Controls & Readiness Score Rating */}
+        <div className="flex flex-wrap items-center gap-4">
+          <div
+            onClick={() => setActiveTab("scorer")}
+            title="Click to view full Readiness Scorer details"
+            className="cursor-pointer rounded border border-brass-500/40 bg-ink-900 px-4 py-2 text-center shadow-soft hover:border-brass-400 transition-all flex flex-col justify-center"
+          >
+            <span className="flex items-center justify-center gap-1.5 text-[0.65rem] font-semibold uppercase tracking-wider text-brass-400">
+              <Award size={13} />
+              Readiness Score
+            </span>
+            <div className="flex items-center justify-center gap-2 mt-0.5">
+              <span className="font-data text-xl font-bold text-surface">{scoreVal}/100</span>
+              <Badge tone={scoreTone}>{scoreClassification}</Badge>
+            </div>
           </div>
-        </SectionCard>
-      </div>
 
-      {/* Business Analysis */}
-      <SectionCard icon={TrendingUp} title="Business Analysis" tone="purple">
-        <div className="grid gap-5 sm:grid-cols-3">
-          <Info label="Market Potential" value={a.marketPotential} />
-          <Info label="Revenue Prediction" value={a.revenuePrediction} />
-          <Info label="Growth Prediction" value={a.growthPrediction} />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              if (!editedAssumptions && assumptions) {
+                setEditedAssumptions(JSON.parse(JSON.stringify(assumptions)));
+              }
+              setShowAssumptions(!showAssumptions);
+            }}
+            className="flex items-center gap-2 border-outline-variant text-ink-900 hover:bg-surface-container-high"
+          >
+            <Sliders size={16} className="text-brass-600" />
+            <span>{showAssumptions ? "Hide Assumptions" : "Calibrate Assumptions"}</span>
+          </Button>
+
+          <Link
+            to={`/investor-room?simulationId=${simulation._id}`}
+            className="wax-seal inline-flex items-center justify-center px-5 py-2.5 text-xs"
+          >
+            Enter Investor Pitch Room
+          </Link>
         </div>
-      </SectionCard>
-
-      {/* SWOT Analysis */}
-      <h2 className="text-lg font-semibold">SWOT Analysis</h2>
-      <div className="grid gap-6 sm:grid-cols-2">
-        <SectionCard icon={CheckCircle2} title="Strengths" tone="green">
-          <List items={a.strengths} emptyText="No strengths identified." />
-        </SectionCard>
-        <SectionCard icon={XCircle} title="Weaknesses" tone="red">
-          <List items={a.weaknesses} emptyText="No weaknesses identified." />
-        </SectionCard>
-        <SectionCard icon={Lightbulb} title="Opportunities">
-          <List items={a.recommendations} emptyText="No opportunities identified." />
-        </SectionCard>
-        <SectionCard icon={ShieldAlert} title="Threats" tone="amber">
-          <List items={a.risks} emptyText="No threats identified." />
-        </SectionCard>
       </div>
 
-      {/* Risk Analysis */}
-      <SectionCard icon={ShieldAlert} title="Risk Analysis" tone="amber">
-        <List items={a.risks} emptyText="No specific risks identified." />
-      </SectionCard>
+      {/* Interactive Assumption Calibration Drawer */}
+      {showAssumptions && (
+        <div className="bg-surface-container-low border-2 border-brass-500/40 rounded-lg p-6 shadow-card animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex items-center justify-between border-b border-outline-variant pb-4 mb-4">
+            <div>
+              <h3 className="font-headline text-lg font-bold text-ink-900 flex items-center gap-2">
+                <Sliders className="text-brass-600" size={20} />
+                <span>Live Assumption Calibration Engine</span>
+              </h3>
+              <p className="text-xs text-ink-500 mt-0.5">
+                Modify any baseline parameter below. Re-running will instantly execute deterministic financial calculations across all 12 months.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setEditedAssumptions(JSON.parse(JSON.stringify(assumptions)))}
+                disabled={rerunning}
+                className="text-xs py-1.5 px-3"
+              >
+                Reset to Original
+              </Button>
+              <Button
+                type="button"
+                onClick={handleApplyAssumptions}
+                loading={rerunning}
+                className="bg-brass-500 hover:bg-brass-600 text-ink-900 font-bold text-xs py-1.5 px-4 flex items-center gap-1.5"
+              >
+                <RefreshCw size={14} className={rerunning ? "animate-spin" : ""} />
+                <span>Re-run Simulation</span>
+              </Button>
+            </div>
+          </div>
 
-      {/* AI Suggestions */}
-      <SectionCard icon={Lightbulb} title="AI Suggestions">
-        <List items={a.recommendations} emptyText="No suggestions available." />
-      </SectionCard>
+          <AssumptionsPanel
+            assumptions={editedAssumptions}
+            onChange={setEditedAssumptions}
+            disabled={rerunning}
+          />
+        </div>
+      )}
 
-      {/* Funding Recommendation */}
-      <SectionCard icon={Landmark} title="Funding Recommendation" tone="purple">
-        <Badge tone={tone}>{label}</Badge>
-        <p className="mt-3 text-sm text-slate-600">{text}</p>
-      </SectionCard>
+      {/* Top 12-Month Summary Bar */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-lg shadow-soft">
+          <span className="text-[0.7rem] font-semibold uppercase tracking-wider text-ink-500 block mb-1">
+            Total 12M Revenue
+          </span>
+          <span className="font-data text-xl font-bold text-ink-900">
+            {formatCurrency(summary?.totalRevenue)}
+          </span>
+        </div>
 
-      {/* Final Verdict */}
-      <div className="rounded-2xl border border-primary-100 bg-primary-50 p-6">
-        <h3 className="font-semibold">Final Verdict</h3>
-        <p className="mt-2 text-sm text-slate-700">
-          With an AI score of <b>{a.startupScore ?? 0}/100</b>, this startup falls into
-          the "{label}" category. {text}
-        </p>
-        <Link
-          to={`/investor-room?simulationId=${simulation._id}`}
-          className="mt-5 inline-flex rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white"
+        <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-lg shadow-soft">
+          <span className="text-[0.7rem] font-semibold uppercase tracking-wider text-ink-500 block mb-1">
+            Total 12M Expenses
+          </span>
+          <span className="font-data text-xl font-bold text-ink-900">
+            {formatCurrency(summary?.totalExpenses)}
+          </span>
+        </div>
+
+        <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-lg shadow-soft">
+          <span className="text-[0.7rem] font-semibold uppercase tracking-wider text-ink-500 block mb-1">
+            Final M12 Cash
+          </span>
+          <span className={`font-data text-xl font-bold ${isExhausted ? "text-burgundy-600" : "text-ink-900"}`}>
+            {formatCurrency(summary?.finalEndingCash)}
+          </span>
+        </div>
+
+        <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-lg shadow-soft">
+          <span className="text-[0.7rem] font-semibold uppercase tracking-wider text-ink-500 block mb-1">
+            Break-Even Status
+          </span>
+          <span className="font-data text-base font-bold text-ink-900">
+            {summary?.breakEvenMonth ? `Achieved in Month ${summary.breakEvenMonth}` : "Not in first 12 mos"}
+          </span>
+        </div>
+
+        <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-lg shadow-soft col-span-2 sm:col-span-1">
+          <span className="text-[0.7rem] font-semibold uppercase tracking-wider text-ink-500 block mb-1">
+            Survival Outlook
+          </span>
+          <span className={`font-data text-sm font-bold flex items-center gap-1.5 ${
+            isExhausted ? "text-burgundy-600" : "text-ink-700"
+          }`}>
+            {isExhausted ? (
+              <>
+                <AlertTriangle size={16} />
+                <span>Exhausted M{summary.cashExhaustedMonth}</span>
+              </>
+            ) : (
+              <>
+                <ShieldCheck size={16} className="text-brass-600" />
+                <span>Survived 12 Months</span>
+              </>
+            )}
+          </span>
+        </div>
+      </div>
+
+      {/* Warnings & Alerts */}
+      <WarningsBanner warnings={warnings} />
+
+      {/* Tab Switcher: Readiness Scorer vs 12-Month Timeline */}
+      <div className="flex border-b border-outline-variant gap-6 pt-2">
+        <button
+          onClick={() => setActiveTab("scorer")}
+          className={`flex items-center gap-2 pb-3 font-headline text-base font-bold transition-colors relative ${
+            activeTab === "scorer"
+              ? "text-brass-600"
+              : "text-on-surface-variant hover:text-ink-900"
+          }`}
         >
-          Pitch This Startup in the Investor Room
-        </Link>
+          <Award size={18} />
+          <span>Startup Readiness Scorer</span>
+          {activeTab === "scorer" && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brass-600 rounded-t" />
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab("timeline")}
+          className={`flex items-center gap-2 pb-3 font-headline text-base font-bold transition-colors relative ${
+            activeTab === "timeline"
+              ? "text-brass-600"
+              : "text-on-surface-variant hover:text-ink-900"
+          }`}
+        >
+          <TrendingUp size={18} />
+          <span>12-Month Growth Simulation</span>
+          {activeTab === "timeline" && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brass-600 rounded-t" />
+          )}
+        </button>
+      </div>
+
+      {activeTab === "scorer" ? (
+        <StartupScorerDashboard scoreData={simulation.score} startupName={simulation.startupName} />
+      ) : (
+        <div className="space-y-6 animate-in fade-in duration-300">
+          {/* Scenario Switcher */}
+          <ScenarioToggle
+            activeScenario={activeScenario}
+            onChange={(scen) => {
+              setActiveScenario(scen);
+              setIsPlaying(false);
+            }}
+            scenarios={simulation.scenarios || {}}
+          />
+
+          {/* Interactive Timeline Scrubber */}
+          <TimelineScrubber
+            selectedMonth={selectedMonth}
+            onChange={(m) => {
+              setSelectedMonth(m);
+              setIsPlaying(false);
+            }}
+            monthlyData={monthlyList}
+            isPlaying={isPlaying}
+            onTogglePlay={() => setIsPlaying(!isPlaying)}
+          />
+
+          {/* Selected Month Snapshot Details */}
+          <MonthSnapshot monthData={selectedMonthData} />
+
+          {/* 12-Month Interactive Visualizations */}
+          <div className="mt-8">
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="text-brass-600" size={20} />
+              <h2 className="font-headline text-xl font-bold text-ink-900">
+                12-Month Financial & Operational Trajectories ({activeScenario.toUpperCase()})
+              </h2>
+            </div>
+            <SimulationCharts monthlyData={monthlyList} />
+          </div>
+        </div>
+      )}
+
+      {/* Startup Overview Refresher */}
+      <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-6 shadow-soft mt-8">
+        <h3 className="font-headline text-lg font-bold text-ink-900 mb-4 pb-2 border-b border-outline-variant flex items-center gap-2">
+          <Building2 size={18} className="text-ink-600" />
+          <span>Original Startup Hypothesis</span>
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-500 block mb-1">Idea & Solution</span>
+            <p className="text-ink-900 leading-relaxed whitespace-pre-line">{simulation.idea}</p>
+          </div>
+          <div className="space-y-3">
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-wider text-ink-500 block mb-1">Target Audience</span>
+              <p className="text-ink-900">{simulation.targetAudience || "—"}</p>
+            </div>
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-wider text-ink-500 block mb-1">Business & Revenue Model</span>
+              <p className="text-ink-900">{simulation.businessModel || "—"}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

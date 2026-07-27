@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 
 const tones = {
-  primary: "bg-primary-50 text-primary-600",
-  green: "bg-emerald-50 text-emerald-600",
-  red: "bg-red-50 text-red-600",
-  amber: "bg-amber-50 text-amber-600",
-  purple: "bg-violet-50 text-violet-600",
+  primary: "bg-ink-100 text-ink-700",
+  green: "bg-surface-container-high text-ink-600",
+  red: "bg-burgundy-50 text-burgundy-700",
+  amber: "bg-brass-50 text-brass-700",
+  purple: "bg-ink-50 text-ink-800",
 };
 
 export default function SectionCard({ icon: Icon, title, tone = "primary", children, className = "" }) {
@@ -13,15 +13,15 @@ export default function SectionCard({ icon: Icon, title, tone = "primary", child
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`rounded-2xl border border-slate-100 bg-white p-6 shadow-card ${className}`}
+      className={`dossier-card p-6 paper-grain ${className}`}
     >
       <div className="mb-4 flex items-center gap-3">
         {Icon && (
-          <div className={`rounded-xl p-2.5 ${tones[tone]}`}>
+          <div className={`rounded p-2.5 ${tones[tone]}`}>
             <Icon size={17} />
           </div>
         )}
-        <h3 className="font-semibold text-slate-900">{title}</h3>
+        <h3 className="font-headline font-semibold text-ink-900">{title}</h3>
       </div>
       {children}
     </motion.div>

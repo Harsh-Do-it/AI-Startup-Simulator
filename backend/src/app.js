@@ -21,6 +21,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+app.use("/api/v2", apiRoutes);
 app.use("/api", apiRoutes);
 
 app.use(notFound);

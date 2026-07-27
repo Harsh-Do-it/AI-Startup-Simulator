@@ -6,11 +6,10 @@ const requestTimeoutMs = 30000;
 
 const fallbackModels = [
   env.GEMINI_MODEL,
-  "gemini-3.5-flash",
-  "gemini-3-flash-preview",
-  "gemini-3.1-flash-lite-preview",
-  "gemini-flash-latest",
+  "gemini-2.5-flash",
   "gemini-2.0-flash",
+  "gemini-1.5-flash",
+  "gemini-1.5-pro",
 ].filter((model, index, models) => model && models.indexOf(model) === index);
 
 const getErrorMessage = (error) => {
@@ -35,6 +34,33 @@ const logGeminiError = (model, error) => {
 
 const shouldTryNextModel = (error) => {
   return [404, 429, 500, 502, 503, 504].includes(error.status);
+};
+
+const verifyModelAtBoot = async () => {
+  if (!env.GEMINI_API_KEY || env.NODE_ENV === "test") {
+    console.log("[Gemini] Skipping live boot verification in test/unconfigured environment.");
+    return true;
+  }
+  try {
+    const genAI = new GoogleGenAI({
+      apiKey: env.GEMINI_API_KEY,
+      httpOptions: { timeout: 10000 },
+    });
+    await genAI.models.generateContent({
+      model: env.GEMINI_MODEL,
+      contents: "test",
+    });
+    console.log(`[Gemini] Boot verification successful for model: ${env.GEMINI_MODEL}`);
+    return true;
+  } catch (error) {
+    const msg = getErrorMessage(error) || "";
+    if (error?.status === 404 || error?.status === 400 || msg.toLowerCase().includes("not found") || msg.toLowerCase().includes("deprecated") || msg.toLowerCase().includes("unsupported")) {
+      console.error(`[CRITICAL BOOT ERROR] Configured Gemini model '${env.GEMINI_MODEL}' returned 404/deprecated response from Google API. Server cannot boot with invalid AI model.`);
+      throw new Error(`[CRITICAL BOOT ERROR] Model ${env.GEMINI_MODEL} is invalid or deprecated: ${msg}`);
+    }
+    console.warn(`[Gemini] Boot check encountered non-fatal error (${error?.status || 'network'}): ${msg}`);
+    return true;
+  }
 };
 
 const generateContent = async (prompt) => {
@@ -91,4 +117,4 @@ const generateContent = async (prompt) => {
   ]);
 };
 
-module.exports = { generateContent };
+module.exports = { generateContent, verifyModelAtBoot, fallbackModels };

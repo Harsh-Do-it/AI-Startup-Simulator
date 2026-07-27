@@ -5,16 +5,16 @@ export default function EmptyState({ icon: Icon, title, description, action }) {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-16 text-center"
+      className="flex flex-col items-center justify-center rounded border border-dashed border-brass-400 bg-surface-container-lowest px-6 py-16 text-center shadow-soft"
     >
       {Icon && (
-        <div className="mb-4 rounded-2xl bg-primary-50 p-4 text-primary-600">
+        <div className="mb-4 rounded bg-brass-100 p-4 text-brass-700">
           <Icon size={26} />
         </div>
       )}
-      <h3 className="font-semibold text-slate-900">{title}</h3>
+      <h3 className="font-headline font-semibold text-ink-900">{title}</h3>
       {description && (
-        <p className="mt-1.5 max-w-sm text-sm text-slate-500">{description}</p>
+        <p className="mt-1.5 max-w-sm text-sm text-on-surface-variant">{description}</p>
       )}
       {action && <div className="mt-6">{action}</div>}
     </motion.div>

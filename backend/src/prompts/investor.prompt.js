@@ -1,4 +1,9 @@
+const { getBenchmarksForIndustry } = require("../services/marketBenchmarkService");
+
 const buildInvestorQuestionsPrompt = (simulation) => {
+  const comps = getBenchmarksForIndustry(simulation.industry || "");
+  const compsText = `Market Comps (${comps.industryName}): ARR Valuation Multiple ${comps.valuationMultipleARR.value}x (Range ${comps.valuationMultipleARR.min}x-${comps.valuationMultipleARR.max}x; Source: ${comps.valuationMultipleARR.sourceName}), Typical Monthly Churn ${(comps.churnRate.value * 100).toFixed(1)}%, Regulatory Flags: ${comps.regulatoryFlags.join(", ")}`;
+
   return `You are a panel of experienced venture capital investors conducting a Shark Tank / Y Combinator style interview for the following startup.
 
 Startup Name: ${simulation.startupName}
@@ -9,8 +14,9 @@ Business Model: ${simulation.businessModel}
 Pricing: ${simulation.pricing}
 Problem Statement: ${simulation.problemStatement}
 Unique Selling Proposition: ${simulation.uniqueSellingProposition}
+${compsText}
 
-Generate exactly 10 tough, realistic, specific investor interview questions covering these categories in this exact order: Problem, Market, Revenue, Competition, Growth, Team, Business Model, Pricing, Marketing, Risks.
+Generate exactly 10 tough, realistic, specific investor interview questions covering these categories in this exact order: Problem, Market, Revenue, Competition, Growth, Team, Business Model, Pricing, Marketing, Risks. Ground your Market, Revenue, and Risks questions in the provided Market Comps.
 
 You must respond with ONLY valid JSON. Do not include markdown formatting, code fences, explanations, or any text outside the JSON.
 
@@ -66,6 +72,9 @@ Rules:
 };
 
 const buildFinalReportPrompt = ({ simulation, questions, answers }) => {
+  const comps = getBenchmarksForIndustry(simulation.industry || "");
+  const compsText = `Market Comps (${comps.industryName}): ARR Valuation Multiple ${comps.valuationMultipleARR.value}x (Range ${comps.valuationMultipleARR.min}x-${comps.valuationMultipleARR.max}x; Source: ${comps.valuationMultipleARR.sourceName}), Typical Monthly Churn ${(comps.churnRate.value * 100).toFixed(1)}%, Regulatory Flags: ${comps.regulatoryFlags.join(", ")}`;
+
   const transcript = questions
     .map((q) => {
       const matchingAnswer = answers.find((a) => a.questionNumber === q.questionNumber);
@@ -83,6 +92,7 @@ Industry: ${simulation.industry}
 Target Audience: ${simulation.targetAudience}
 Business Model: ${simulation.businessModel}
 Pricing: ${simulation.pricing}
+${compsText}
 
 Full Interview Transcript:
 ${transcript}

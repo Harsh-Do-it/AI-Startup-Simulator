@@ -10,9 +10,11 @@ function App() {
         toastOptions={{
           duration: 3500,
           style: {
-            borderRadius: "10px",
-            background: "#0f172a",
-            color: "#fff",
+            borderRadius: "4px",
+            background: "#14231c", // Ink Navy
+            color: "#fdf9f2", // Ledger Ivory
+            border: "1px solid #B08D4A", // Aged Brass
+            fontFamily: "'Inter', sans-serif",
             fontSize: "14px",
           },
         }}

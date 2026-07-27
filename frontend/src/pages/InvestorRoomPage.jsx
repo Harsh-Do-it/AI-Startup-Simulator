@@ -35,14 +35,14 @@ function ScoreRing({ score }) {
   const offset = c - (score / 100) * c;
   const color =
     score >= 75
-      ? "#10b981"
+      ? "#1F3D2B" // Deep Forest
       : score >= 50
-        ? "#f59e0b"
-        : "#ef4444";
+        ? "#B08D4A" // Aged Brass
+        : "#7B2D26"; // Muted Burgundy
 
   return (
     <svg viewBox="0 0 100 100" className="h-28 w-28">
-      <circle cx="50" cy="50" r={r} fill="none" stroke="#e2e8f0" strokeWidth="8" />
+      <circle cx="50" cy="50" r={r} fill="none" stroke="var(--color-outline-variant)" strokeWidth="8" />
       <motion.circle
         cx="50" cy="50" r={r} fill="none" stroke={color} strokeWidth="8"
         strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c}
@@ -50,7 +50,7 @@ function ScoreRing({ score }) {
         transition={{ duration: 1.2, ease: "easeOut" }}
         transform="rotate(-90 50 50)"
       />
-      <text x="50" y="54" textAnchor="middle" className="fill-slate-900 text-lg font-bold" fontSize="18">
+      <text x="50" y="54" textAnchor="middle" className="fill-ink-900 font-data text-lg font-bold" fontSize="18">
         {score}
       </text>
     </svg>
@@ -62,50 +62,50 @@ function FeedbackPanel({ feedback }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-      className="mt-6 space-y-4 rounded-2xl border border-slate-100 bg-slate-50 p-5"
+      className="mt-6 space-y-4 rounded border border-brass-200 bg-brass-50 p-5 shadow-soft"
     >
       <div className="flex items-center justify-between">
-        <h4 className="font-semibold text-slate-800">AI Investor Evaluation</h4>
+        <h4 className="font-headline font-bold text-ink-900">AI Investor Evaluation</h4>
         <Badge tone={scoreTone(feedback.score)}>{feedback.score}/100</Badge>
       </div>
 
-      <p className="text-sm italic text-slate-600">"{feedback.investorComment}"</p>
+      <p className="text-sm italic text-ink-800">"{feedback.investorComment}"</p>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div>
-          <p className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase text-emerald-600">
+          <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-green-700">
             <CheckCircle2 size={13} /> Strengths
           </p>
-          <ul className="space-y-1">
+          <ul className="space-y-1.5">
             {feedback.strengths?.map((s, i) => (
-              <li key={i} className="flex gap-1.5 text-sm text-slate-600">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" />
+              <li key={i} className="flex gap-1.5 text-sm text-ink-800">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />
                 {s}
               </li>
             ))}
           </ul>
         </div>
         <div>
-          <p className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase text-red-600">
+          <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-burgundy-700">
             <XCircle size={13} /> Weaknesses
           </p>
-          <ul className="space-y-1">
+          <ul className="space-y-1.5">
             {feedback.weaknesses?.map((w, i) => (
-              <li key={i} className="flex gap-1.5 text-sm text-slate-600">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" />
+              <li key={i} className="flex gap-1.5 text-sm text-ink-800">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-burgundy-500" />
                 {w}
               </li>
             ))}
           </ul>
         </div>
         <div>
-          <p className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase text-primary-600">
+          <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-brass-700">
             <Lightbulb size={13} /> Improvements
           </p>
-          <ul className="space-y-1">
+          <ul className="space-y-1.5">
             {feedback.improvements?.map((imp, i) => (
-              <li key={i} className="flex gap-1.5 text-sm text-slate-600">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-400" />
+              <li key={i} className="flex gap-1.5 text-sm text-ink-800">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brass-500" />
                 {imp}
               </li>
             ))}
@@ -127,15 +127,15 @@ function FinalReport({ report }) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-      <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-card text-center">
-        <Trophy size={32} className="mx-auto text-primary-600" />
-        <h2 className="mt-4 text-2xl font-bold text-slate-900">Investor Verdict</h2>
-        <div className="mt-5 flex items-center justify-center gap-6">
+      <div className="dossier-card p-8 text-center paper-grain">
+        <Trophy size={32} className="mx-auto text-brass-600" />
+        <h2 className="font-headline mt-4 text-2xl font-bold text-ink-900">Investor Verdict</h2>
+        <div className="mt-6 flex items-center justify-center gap-8">
           <ScoreRing score={report.overallScore} />
           <div className="text-left">
-            <Badge tone={decisionTone} className="text-base px-4 py-1.5">{report.decision}</Badge>
-            <p className="mt-2 text-sm text-slate-600">
-              Funding Probability: <b>{report.probabilityOfFunding}</b>
+            <Badge tone={decisionTone} className="text-base px-4 py-1.5 font-headline font-bold">{report.decision}</Badge>
+            <p className="mt-2 text-sm text-on-surface-variant">
+              Funding Probability: <b className="text-ink-900 font-data">{report.probabilityOfFunding}</b>
             </p>
           </div>
         </div>
@@ -145,8 +145,8 @@ function FinalReport({ report }) {
         <SectionCard icon={CheckCircle2} title="Strong Points" tone="green">
           <ul className="space-y-2">
             {report.strongPoints?.map((p, i) => (
-              <li key={i} className="flex gap-2 text-sm text-slate-600">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" />
+              <li key={i} className="flex gap-2 text-sm text-ink-800 leading-relaxed">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />
                 {p}
               </li>
             ))}
@@ -155,8 +155,8 @@ function FinalReport({ report }) {
         <SectionCard icon={XCircle} title="Weak Points" tone="red">
           <ul className="space-y-2">
             {report.weakPoints?.map((p, i) => (
-              <li key={i} className="flex gap-2 text-sm text-slate-600">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" />
+              <li key={i} className="flex gap-2 text-sm text-ink-800 leading-relaxed">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-burgundy-500" />
                 {p}
               </li>
             ))}
@@ -165,8 +165,8 @@ function FinalReport({ report }) {
         <SectionCard icon={ShieldAlert} title="Major Risks" tone="amber">
           <ul className="space-y-2">
             {report.majorRisks?.map((r, i) => (
-              <li key={i} className="flex gap-2 text-sm text-slate-600">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" />
+              <li key={i} className="flex gap-2 text-sm text-ink-800 leading-relaxed">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brass-500" />
                 {r}
               </li>
             ))}
@@ -175,8 +175,8 @@ function FinalReport({ report }) {
         <SectionCard icon={Lightbulb} title="Suggestions">
           <ul className="space-y-2">
             {report.suggestions?.map((s, i) => (
-              <li key={i} className="flex gap-2 text-sm text-slate-600">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-400" />
+              <li key={i} className="flex gap-2 text-sm text-ink-800 leading-relaxed">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink-400" />
                 {s}
               </li>
             ))}
@@ -184,10 +184,10 @@ function FinalReport({ report }) {
         </SectionCard>
       </div>
 
-      <div className="rounded-2xl border border-primary-100 bg-primary-50 p-6 text-center">
-        <p className="text-sm text-slate-700">
+      <div className="rounded border border-brass-200 bg-brass-50 p-6 text-center">
+        <p className="text-sm text-ink-800">
           Your investor session is complete. You can review it anytime from your{" "}
-          <Link to="/investor-history" className="font-semibold text-primary-600 hover:underline">
+          <Link to="/investor-history" className="font-semibold text-brass-700 hover:text-brass-600 hover:underline">
             Investor History
           </Link>.
         </p>
@@ -337,11 +337,8 @@ export default function InvestorRoomPage() {
         title="No simulations found"
         description="You need to run a startup simulation first before entering the Investor Room."
         action={
-          <Link
-            to="/simulations/new"
-            className="rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white"
-          >
-            Create a Simulation
+          <Link to="/simulations/new">
+            <Button variant="primary">Create a Simulation</Button>
           </Link>
         }
       />
@@ -360,25 +357,25 @@ export default function InvestorRoomPage() {
             {feedbacks.map((fb, idx) => {
               const q = questions[idx];
               return (
-                <div key={idx} className="rounded-xl border border-slate-100 bg-white p-4">
+                <div key={idx} className="rounded border border-outline-variant bg-surface-container-lowest p-4">
                   <div className="flex items-start justify-between gap-3">
-                    <p className="text-sm font-semibold text-slate-800">
+                    <p className="font-headline font-semibold text-ink-900">
                       Q{q.questionNumber}. <Badge tone="blue" className="ml-1">{q.category}</Badge>
                     </p>
                     <Badge tone={scoreTone(fb.score)}>{fb.score}/100</Badge>
                   </div>
-                  <p className="mt-2 text-sm text-slate-700">{q.question}</p>
-                  <p className="mt-2 rounded-lg bg-primary-50 p-3 text-sm text-slate-700">
-                    <b>Your answer:</b> {fb.userAnswer}
+                  <p className="mt-2 text-sm font-medium text-ink-800">{q.question}</p>
+                  <p className="mt-3 rounded border border-brass-200 bg-brass-50 p-3 text-sm text-ink-800">
+                    <b className="text-ink-900">Your answer:</b> {fb.userAnswer}
                   </p>
-                  <p className="mt-2 text-sm italic text-slate-500">"{fb.investorComment}"</p>
+                  <p className="mt-3 text-sm italic text-on-surface-variant">"{fb.investorComment}"</p>
                 </div>
               );
             })}
           </div>
         </SectionCard>
 
-        <div className="text-center">
+        <div className="text-center mt-8">
           <Button onClick={handleReset} variant="outline">Start Another Session</Button>
         </div>
       </div>
@@ -396,8 +393,8 @@ export default function InvestorRoomPage() {
         {/* Header */}
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Investor Room</h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <h1 className="font-headline text-2xl font-bold text-ink-900">Investor Room</h1>
+            <p className="mt-1 text-sm text-on-surface-variant">
               Answer the investor's questions. Each answer is evaluated in real time.
             </p>
           </div>
@@ -407,9 +404,9 @@ export default function InvestorRoomPage() {
         </div>
 
         {/* Progress bar */}
-        <div className="h-2 w-full rounded-full bg-slate-200">
+        <div className="h-2 w-full rounded-full bg-surface-container-high overflow-hidden">
           <motion.div
-            className="h-2 rounded-full bg-primary-600"
+            className="h-2 rounded-full bg-brass-500"
             initial={{ width: 0 }}
             animate={{ width: `${progressPct}%` }}
             transition={{ duration: 0.5 }}
@@ -429,17 +426,17 @@ export default function InvestorRoomPage() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.35 }}
-          className="rounded-2xl border border-slate-100 bg-white p-6 shadow-card"
+          className="dossier-card p-6 paper-grain"
         >
           <div className="mb-1 flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded bg-ink-800 font-data text-xs font-bold text-surface">
               {q.questionNumber}
             </div>
             <Badge tone="blue">{q.category}</Badge>
           </div>
-          <p className="mt-3 text-base font-medium text-slate-800">{q.question}</p>
+          <p className="mt-4 text-base font-semibold text-ink-900">{q.question}</p>
 
-          <div className="mt-5">
+          <div className="mt-6">
             <Textarea
               label="Your Answer"
               placeholder="Type your answer here... Be specific and strategic."
@@ -450,7 +447,7 @@ export default function InvestorRoomPage() {
             />
           </div>
 
-          <div className="mt-4 flex gap-3">
+          <div className="mt-5 flex gap-3">
             <Button
               onClick={handleSubmitAnswer}
               loading={submitting}
@@ -464,14 +461,14 @@ export default function InvestorRoomPage() {
 
         {/* Answered questions summary */}
         {feedbacks.length > 0 && (
-          <details className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card">
-            <summary className="cursor-pointer text-sm font-semibold text-slate-700">
+          <details className="rounded border border-outline-variant bg-surface-container-lowest p-4 shadow-soft">
+            <summary className="cursor-pointer text-sm font-semibold uppercase tracking-wider text-on-surface-variant outline-none">
               Previous Answers ({feedbacks.length}/{questions.length} completed)
             </summary>
-            <div className="mt-3 space-y-3">
+            <div className="mt-4 space-y-3">
               {feedbacks.map((fb, idx) => (
-                <div key={idx} className="flex items-center justify-between rounded-xl border p-3">
-                  <span className="text-sm text-slate-700">
+                <div key={idx} className="flex items-center justify-between rounded border border-outline-variant p-3 bg-surface">
+                  <span className="text-sm font-medium text-ink-800">
                     Q{fb.questionNumber}. {questions[idx]?.category}
                   </span>
                   <Badge tone={scoreTone(fb.score)}>{fb.score}/100</Badge>
@@ -491,12 +488,12 @@ export default function InvestorRoomPage() {
     <div className="mx-auto max-w-3xl space-y-6">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-100 text-primary-700">
+          <div className="flex h-12 w-12 items-center justify-center rounded bg-brass-50 text-brass-700">
             <Users size={24} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Investor Room</h1>
-            <p className="text-sm text-slate-500">
+            <h1 className="font-headline text-2xl font-bold text-ink-900">Investor Room</h1>
+            <p className="text-sm text-on-surface-variant">
               Pitch your startup to an AI investor panel. 10 tough questions. Real-time scoring.
             </p>
           </div>
@@ -507,20 +504,20 @@ export default function InvestorRoomPage() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="rounded-2xl border border-slate-100 bg-white p-6 shadow-card"
+        className="dossier-card p-6 paper-grain"
       >
-        <h2 className="mb-4 font-semibold text-slate-900">Select a Startup to Pitch</h2>
+        <h2 className="mb-4 font-semibold uppercase tracking-wider text-xs text-on-surface-variant">Select a Startup to Pitch</h2>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           <select
             value={selectedSimId}
             onChange={(e) => setSelectedSimId(e.target.value)}
-            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+            className="w-full rounded border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-sm outline-none focus:border-brass-500 focus:ring-2 focus:ring-brass-100"
           >
             <option value="">Choose a simulation...</option>
             {simulations.map((s) => (
               <option key={s._id} value={s._id}>
-                {s.startupName} — {s.industry} (Score: {s.analysis?.startupScore ?? 0}/100)
+                {s.startupName} — {s.industry} (Score: {s.score?.overallScore ?? s.startupScore ?? s.analysis?.startupScore ?? 0}/100)
               </option>
             ))}
           </select>
@@ -529,21 +526,21 @@ export default function InvestorRoomPage() {
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
-              className="rounded-xl border border-primary-100 bg-primary-50 p-4"
+              className="rounded border border-brass-200 bg-brass-50 p-5 shadow-soft"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold text-slate-800">{selectedSim.startupName}</p>
-                  <p className="text-sm text-slate-600">{selectedSim.industry}</p>
+                  <p className="font-headline text-lg font-bold text-ink-900">{selectedSim.startupName}</p>
+                  <p className="text-sm text-brass-700 font-semibold uppercase tracking-wider text-xs mt-1">{selectedSim.industry}</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-xs text-slate-500">AI Score</p>
-                  <p className="text-xl font-bold text-primary-700">
-                    {selectedSim.analysis?.startupScore ?? 0}/100
+                <div className="text-center bg-white rounded p-2 border border-brass-200">
+                  <p className="text-[10px] font-semibold uppercase text-on-surface-variant">AI Score</p>
+                  <p className="font-data text-xl font-bold text-ink-900 leading-none mt-1">
+                    {selectedSim.score?.overallScore ?? selectedSim.startupScore ?? selectedSim.analysis?.startupScore ?? 0}
                   </p>
                 </div>
               </div>
-              <p className="mt-3 text-sm text-slate-600 line-clamp-2">
+              <p className="mt-4 text-sm text-ink-800 line-clamp-2 leading-relaxed">
                 {selectedSim.idea}
               </p>
             </motion.div>
@@ -556,18 +553,18 @@ export default function InvestorRoomPage() {
         </div>
       </motion.div>
 
-      <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-6 text-center">
-        <Gauge size={24} className="mx-auto text-slate-400" />
-        <h3 className="mt-3 font-semibold text-slate-700">How It Works</h3>
-        <div className="mx-auto mt-4 grid max-w-xl gap-3 sm:grid-cols-3">
+      <div className="rounded border border-dashed border-brass-300 bg-surface-container-lowest p-6 text-center shadow-soft">
+        <Gauge size={24} className="mx-auto text-brass-600" />
+        <h3 className="mt-3 font-headline font-semibold text-ink-900">How It Works</h3>
+        <div className="mx-auto mt-5 grid max-w-xl gap-4 sm:grid-cols-3">
           {[
             ["10 Questions", "AI asks 10 tough VC questions about your startup."],
             ["Real-time Scoring", "Each answer is scored with strengths and weaknesses."],
             ["Final Verdict", "Get a funding decision and probability."],
           ].map(([title, desc]) => (
-            <div key={title} className="rounded-xl bg-slate-50 p-3">
-              <p className="text-sm font-semibold text-slate-700">{title}</p>
-              <p className="mt-1 text-xs text-slate-500">{desc}</p>
+            <div key={title} className="rounded bg-surface p-4 border border-outline-variant">
+              <p className="text-sm font-semibold text-ink-900">{title}</p>
+              <p className="mt-1.5 text-xs text-on-surface-variant leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>

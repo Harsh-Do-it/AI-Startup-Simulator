@@ -66,7 +66,7 @@ export default function ProfilePage() {
 
   if (error) return <ErrorState type={error} onRetry={fetchData} />;
 
-  const simScores = simulations.map((s) => s.analysis?.startupScore || 0);
+  const simScores = simulations.map((s) => s.score?.overallScore ?? s.startupScore ?? s.analysis?.startupScore ?? 0);
   const avgSimScore = simScores.length
     ? simScores.reduce((a, b) => a + b, 0) / simScores.length
     : 0;
@@ -98,21 +98,21 @@ export default function ProfilePage() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-slate-100 bg-white p-6 shadow-card"
+        className="dossier-card p-6 paper-grain"
       >
         <div className="flex flex-col items-center gap-6 sm:flex-row">
-          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-3xl font-bold text-white shadow-lg">
+          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-ink-800 font-headline text-3xl font-bold text-brass-500 shadow-soft">
             {initial}
           </div>
           <div className="flex-1 text-center sm:text-left">
-            <h1 className="text-2xl font-bold text-slate-900">{user?.name || "Founder"}</h1>
+            <h1 className="font-headline text-2xl font-bold text-ink-900">{user?.name || "Founder"}</h1>
             <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
-              <span className="inline-flex items-center gap-1.5 text-sm text-slate-500">
+              <span className="inline-flex items-center gap-1.5 text-sm text-on-surface-variant">
                 <Mail size={14} />
                 {user?.email}
               </span>
-              <span className="hidden text-slate-300 sm:inline">•</span>
-              <span className="inline-flex items-center gap-1.5 text-sm text-slate-500">
+              <span className="hidden text-brass-300 sm:inline">•</span>
+              <span className="inline-flex items-center gap-1.5 text-sm text-on-surface-variant">
                 <Calendar size={14} />
                 Joined {joinDate}
               </span>
@@ -166,43 +166,45 @@ export default function ProfilePage() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="rounded-2xl border border-slate-100 bg-white p-6 shadow-card"
+        className="dossier-card paper-grain"
       >
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-semibold text-slate-900">Recent Simulations</h2>
-          <Link to="/simulations" className="text-sm text-primary-600 hover:underline">
+        <div className="mb-4 flex items-center justify-between px-6 pt-6">
+          <h2 className="font-headline font-semibold text-ink-900">Recent Simulations</h2>
+          <Link to="/simulations" className="text-sm font-semibold text-brass-700 hover:text-brass-600 transition-colors">
             View all
           </Link>
         </div>
         {simulations.length ? (
-          <div className="space-y-3">
+          <div className="space-y-3 px-6 pb-6">
             {simulations.slice(0, 5).map((s) => (
               <Link
                 key={s._id}
                 to={`/simulations/${s._id}`}
-                className="flex items-center justify-between rounded-xl border p-3 hover:bg-slate-50 transition-colors"
+                className="flex items-center justify-between rounded border border-outline-variant p-3 hover:border-brass-400 hover:bg-surface-container-lowest transition-all"
               >
                 <div>
-                  <p className="font-medium text-slate-800">{s.startupName}</p>
-                  <p className="flex items-center gap-1.5 text-xs text-slate-400">
+                  <p className="font-semibold text-ink-900">{s.startupName}</p>
+                  <p className="flex items-center gap-1.5 text-xs text-on-surface-variant">
                     <Clock size={12} />
                     {new Date(s.createdAt).toLocaleDateString()}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge tone="blue">{s.analysis?.startupScore ?? 0}/100</Badge>
-                  <ArrowRight size={14} className="text-slate-400" />
+                <div className="flex items-center gap-3">
+                  <Badge tone="blue">{s.score?.overallScore ?? s.startupScore ?? s.analysis?.startupScore ?? 0}/100</Badge>
+                  <ArrowRight size={14} className="text-brass-400" />
                 </div>
               </Link>
             ))}
           </div>
         ) : (
-          <p className="text-sm text-slate-500">
-            No simulations yet.{" "}
-            <Link to="/simulations/new" className="text-primary-600 hover:underline">
-              Create your first one
-            </Link>
-          </p>
+          <div className="px-6 pb-6">
+            <p className="text-sm text-on-surface-variant">
+              No simulations yet.{" "}
+              <Link to="/simulations/new" className="font-semibold text-brass-700 hover:text-brass-600 transition-colors">
+                Create your first one
+              </Link>
+            </p>
+          </div>
         )}
       </motion.div>
 
@@ -211,59 +213,63 @@ export default function ProfilePage() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className="rounded-2xl border border-slate-100 bg-white p-6 shadow-card"
+        className="dossier-card paper-grain"
       >
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-semibold text-slate-900">Recent Investor Sessions</h2>
-          <Link to="/investor-history" className="text-sm text-primary-600 hover:underline">
+        <div className="mb-4 flex items-center justify-between px-6 pt-6">
+          <h2 className="font-headline font-semibold text-ink-900">Recent Investor Sessions</h2>
+          <Link to="/investor-history" className="text-sm font-semibold text-brass-700 hover:text-brass-600 transition-colors">
             View all
           </Link>
         </div>
         {investorSessions.length ? (
-          <div className="space-y-3">
+          <div className="space-y-3 px-6 pb-6">
             {investorSessions.slice(0, 5).map((ses) => {
               const isCompleted = ses.status === "completed";
               return (
                 <Link
                   key={ses._id}
                   to={`/investor-session/${ses._id}`}
-                  className="flex items-center justify-between rounded-xl border p-3 hover:bg-slate-50 transition-colors"
+                  className="flex items-center justify-between rounded border border-outline-variant p-3 hover:border-brass-400 hover:bg-surface-container-lowest transition-all"
                 >
                   <div>
-                    <p className="font-medium text-slate-800">
+                    <p className="font-semibold text-ink-900">
                       {ses.simulation?.startupName || "Session"}
                     </p>
-                    <p className="flex items-center gap-1.5 text-xs text-slate-400">
+                    <p className="flex items-center gap-1.5 text-xs text-on-surface-variant">
                       <Clock size={12} />
                       {new Date(ses.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge tone={isCompleted ? "green" : "yellow"}>
-                      {isCompleted ? "Completed" : "In Progress"}
-                    </Badge>
-                    {isCompleted && ses.overallScore != null && (
-                      <Badge tone="blue">{ses.overallScore}/100</Badge>
-                    )}
-                    <ArrowRight size={14} className="text-slate-400" />
+                  <div className="flex items-center gap-3">
+                    <div className="flex gap-2">
+                      <Badge tone={isCompleted ? "green" : "yellow"}>
+                        {isCompleted ? "Completed" : "In Progress"}
+                      </Badge>
+                      {isCompleted && ses.overallScore != null && (
+                        <Badge tone="blue">{ses.overallScore}/100</Badge>
+                      )}
+                    </div>
+                    <ArrowRight size={14} className="text-brass-400" />
                   </div>
                 </Link>
               );
             })}
           </div>
         ) : (
-          <p className="text-sm text-slate-500">
-            No investor sessions yet.{" "}
-            <Link to="/investor-room" className="text-primary-600 hover:underline">
-              Enter the Investor Room
-            </Link>
-          </p>
+          <div className="px-6 pb-6">
+            <p className="text-sm text-on-surface-variant">
+              No investor sessions yet.{" "}
+              <Link to="/investor-room" className="font-semibold text-brass-700 hover:text-brass-600 transition-colors">
+                Enter the Investor Room
+              </Link>
+            </p>
+          </div>
         )}
       </motion.div>
 
       {/* Disclaimer */}
-      <div className="rounded-xl bg-slate-100 p-4 text-center">
-        <p className="text-xs text-slate-500">
+      <div className="rounded border border-dashed border-outline-variant bg-surface-container-low p-4 text-center">
+        <p className="text-xs text-on-surface-variant">
           All simulations and investor evaluations are AI-generated and illustrative.
           They are not financial advice or a guarantee of real-world performance.
         </p>

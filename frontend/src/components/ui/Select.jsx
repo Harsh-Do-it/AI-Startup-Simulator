@@ -2,15 +2,15 @@ export default function Select({ label, error, options, registration, ...rest })
   return (
     <div>
       {label && (
-        <label className="mb-1.5 block text-sm font-medium text-slate-700">
+        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
           {label}
         </label>
       )}
       <select
-        className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm outline-none focus:ring-2 ${
+        className={`w-full rounded border bg-surface-container-lowest px-4 py-2.5 text-sm outline-none focus:ring-2 ${
           error
-            ? "border-red-400"
-            : "border-slate-300 focus:border-primary-500 focus:ring-primary-100"
+            ? "border-burgundy-400 focus:ring-burgundy-200"
+            : "border-outline-variant focus:border-brass-500 focus:ring-brass-100"
         }`}
         {...registration}
         {...rest}
@@ -22,7 +22,7 @@ export default function Select({ label, error, options, registration, ...rest })
           </option>
         ))}
       </select>
-      {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}
+      {error && <p className="mt-1.5 text-xs text-burgundy-500">{error}</p>}
     </div>
   );
 }

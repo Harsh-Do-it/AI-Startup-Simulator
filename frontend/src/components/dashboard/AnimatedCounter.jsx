@@ -18,5 +18,5 @@ export default function AnimatedCounter({ value = 0, duration = 900, decimals = 
     return () => cancelAnimationFrame(frame);
   }, [value, duration]);
 
-  return <span>{display.toFixed(decimals)}</span>;
+  return <span className="font-data">{display.toFixed(decimals)}</span>;
 }

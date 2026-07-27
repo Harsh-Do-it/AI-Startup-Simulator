@@ -3,12 +3,19 @@ const healthRoutes = require("./health.routes");
 const authRoutes = require("./auth.routes");
 const simulationRoutes = require("./simulation.routes");
 const investorRoutes = require("./investor.routes");
+const apiVersion = require("../middleware/apiVersion");
 
 const router = express.Router();
 
-router.use("/", healthRoutes);
-router.use("/auth", authRoutes);
-router.use("/simulations", simulationRoutes);
-router.use("/investor", investorRoutes);
+router.use(apiVersion);
+
+const coreRoutes = express.Router();
+coreRoutes.use("/", healthRoutes);
+coreRoutes.use("/auth", authRoutes);
+coreRoutes.use("/simulations", simulationRoutes);
+coreRoutes.use("/investor", investorRoutes);
+
+router.use("/v2", coreRoutes);
+router.use("/", coreRoutes);
 
 module.exports = router;

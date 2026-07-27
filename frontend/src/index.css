@@ -2,20 +2,80 @@
 
 @theme {
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-serif: "Libre Caslon Text", Georgia, serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
 
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
+  /* Ink Navy – Spine, deep backgrounds, primary headers */
+  --color-ink-900: #0a1610;
+  --color-ink-800: #14231c;
+  --color-ink-700: #1f3d2b;
+  --color-ink-600: #2a5038;
+  --color-ink-500: #3a6a4e;
+  --color-ink-400: #526259;
+  --color-ink-300: #7b8b82;
+  --color-ink-200: #b9cbc0;
+  --color-ink-100: #d5e7db;
+  --color-ink-50: #edf5f0;
 
-  --shadow-soft: 0 4px 24px -4px rgba(0, 0, 0, 0.08);
-  --shadow-card: 0 2px 12px -2px rgba(0, 0, 0, 0.06);
+  /* Brass – Interactive elements, highlights, accent borders */
+  --color-brass-900: #3a2600;
+  --color-brass-800: #5d4203;
+  --color-brass-700: #7a5a10;
+  --color-brass-600: #a48240;
+  --color-brass-500: #b08d4a;
+  --color-brass-400: #c4a55e;
+  --color-brass-300: #e8c178;
+  --color-brass-200: #ffdea6;
+  --color-brass-100: #ffefd3;
+  --color-brass-50: #fff8ec;
+
+  /* Surface – Ledger Ivory workspace */
+  --color-surface: #fdf9f2;
+  --color-surface-dim: #ddd9d3;
+  --color-surface-bright: #fdf9f2;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f7f3ec;
+  --color-surface-container: #f1ede7;
+  --color-surface-container-high: #ece8e1;
+  --color-surface-container-highest: #e6e2dc;
+
+  /* Text */
+  --color-on-surface: #1c1c18;
+  --color-on-surface-variant: #434844;
+
+  /* Outline */
+  --color-outline: #737874;
+  --color-outline-variant: #c3c8c3;
+
+  /* Burgundy – Critical risk, danger */
+  --color-burgundy-900: #3b0a08;
+  --color-burgundy-800: #5c1510;
+  --color-burgundy-700: #7b2d26;
+  --color-burgundy-600: #93000a;
+  --color-burgundy-500: #ba1a1a;
+  --color-burgundy-400: #d84040;
+  --color-burgundy-300: #ffa4a0;
+  --color-burgundy-200: #ffdad6;
+  --color-burgundy-100: #ffedeb;
+  --color-burgundy-50: #fff5f4;
+
+  /* Tailwind-compatible primary aliases (maps to ink) */
+  --color-primary-50: #edf5f0;
+  --color-primary-100: #d5e7db;
+  --color-primary-200: #b9cbc0;
+  --color-primary-300: #7b8b82;
+  --color-primary-400: #526259;
+  --color-primary-500: #3a6a4e;
+  --color-primary-600: #14231c;
+  --color-primary-700: #0a1610;
+  --color-primary-800: #050b08;
+  --color-primary-900: #020503;
+
+  /* Shadows – Tonal, neumorphic, not generic dropshadows */
+  --shadow-soft: 0 4px 24px -4px rgba(20, 35, 28, 0.08);
+  --shadow-card: 0 1px 4px -1px rgba(20, 35, 28, 0.06), 0 2px 12px -2px rgba(20, 35, 28, 0.04);
+  --shadow-dossier: inset 0 1px 0 0 rgba(255, 255, 255, 0.6), 0 2px 8px -2px rgba(20, 35, 28, 0.06);
+  --shadow-glass: 0 8px 32px -4px rgba(20, 35, 28, 0.12);
 
   --animate-fadeIn: fadeIn 0.4s ease-out;
 
@@ -29,6 +89,11 @@
       transform: translateY(0);
     }
   }
+
+  @keyframes brassShimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
 }
 
 * {
@@ -38,19 +103,175 @@
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
 }
 
+/* Scrollbar – Brass tinted */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
+  background-color: var(--color-outline-variant);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-track {
   background-color: transparent;
+}
+
+/* Paper grain texture overlay utility */
+.paper-grain {
+  position: relative;
+}
+
+.paper-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
+}
+
+.paper-grain > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Dossier card – leather-bound left border + brass clasps */
+.dossier-card {
+  background-color: var(--color-surface-container-lowest);
+  border-left: 4px solid var(--color-ink-800);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-dossier);
+  transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dossier-card:hover {
+  box-shadow: var(--shadow-card);
+}
+
+/* Glassmorphism overlay */
+.glass-overlay {
+  background-color: rgba(253, 249, 242, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-brass-500);
+}
+
+/* Wax-seal button style */
+.wax-seal {
+  background-color: var(--color-brass-500);
+  color: var(--color-ink-800);
+  border-radius: 9999px;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wax-seal:hover {
+  background-color: var(--color-brass-600);
+  box-shadow: 0 0 20px rgba(176, 141, 74, 0.3);
+}
+
+/* Brass accent border */
+.brass-border {
+  border: 1px solid var(--color-brass-500);
+}
+
+/* Typography helpers */
+.font-headline {
+  font-family: "Libre Caslon Text", Georgia, serif;
+}
+
+.font-data {
+  font-family: "JetBrains Mono", monospace;
+}
+
+/* Spine nav active indicator */
+.spine-active {
+  position: relative;
+}
+
+.spine-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60%;
+  background-color: var(--color-surface);
+  border-radius: 0 4px 4px 0;
+}
+
+/* Assumption badges */
+.badge-extracted {
+  background-color: var(--color-ink-100);
+  color: var(--color-ink-800);
+  border: 1px solid var(--color-ink-300);
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-default {
+  background-color: var(--color-surface-container-high);
+  color: var(--color-on-surface-variant);
+  border: 1px solid var(--color-outline-variant);
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Timeline scrubber custom styling */
+input[type="range"].timeline-scrubber {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-surface-container-highest);
+  outline: none;
+  border: 1px solid var(--color-outline-variant);
+}
+
+input[type="range"].timeline-scrubber::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-brass-500);
+  cursor: pointer;
+  border: 2px solid var(--color-surface-container-lowest);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+input[type="range"].timeline-scrubber::-webkit-slider-thumb:hover {
+  background: var(--color-brass-600);
+  transform: scale(1.15);
+}
+
+input[type="range"].timeline-scrubber::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-brass-500);
+  cursor: pointer;
+  border: 2px solid var(--color-surface-container-lowest);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+input[type="range"].timeline-scrubber::-moz-range-thumb:hover {
+  background: var(--color-brass-600);
+  transform: scale(1.15);
 }

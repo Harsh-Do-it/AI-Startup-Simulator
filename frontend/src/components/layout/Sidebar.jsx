@@ -44,18 +44,18 @@ export default function Sidebar({ isOpen, onClose }) {
         />
       )}
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col border-r border-slate-100 bg-white transition-transform lg:sticky lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col bg-ink-800 transition-transform lg:sticky lg:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-16 items-center justify-between border-b border-slate-100 px-5">
+        <div className="flex h-16 items-center justify-between border-b border-ink-700/50 px-5">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-600 text-sm font-bold text-white">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brass-500 text-sm font-bold text-ink-800">
               AI
             </div>
-            <span className="font-bold">Simulator</span>
+            <span className="font-headline font-bold text-surface">Simulator</span>
           </div>
-          <button onClick={onClose} className="lg:hidden">
+          <button onClick={onClose} className="text-surface/60 hover:text-surface lg:hidden">
             <X size={18} />
           </button>
         </div>
@@ -67,10 +67,10 @@ export default function Sidebar({ isOpen, onClose }) {
               to={path}
               onClick={onClose}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium ${
+                `relative flex items-center gap-3 rounded px-3.5 py-2.5 text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-primary-50 text-primary-700"
-                    : "text-slate-600 hover:bg-slate-50"
+                    ? "spine-active bg-ink-700 text-surface"
+                    : "text-ink-200 hover:bg-ink-700/50 hover:text-surface"
                 }`
               }
             >
@@ -80,10 +80,10 @@ export default function Sidebar({ isOpen, onClose }) {
           ))}
         </nav>
 
-        <div className="border-t border-slate-100 p-3">
+        <div className="border-t border-ink-700/50 p-3">
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50"
+            className="flex w-full items-center gap-3 rounded px-3.5 py-2.5 text-sm font-medium text-burgundy-300 hover:bg-burgundy-700/20 hover:text-burgundy-200"
           >
             <LogOut size={18} />
             Logout

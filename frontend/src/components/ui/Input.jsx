@@ -2,21 +2,21 @@ export default function Input({ label, error, type = "text", registration, ...re
   return (
     <div className="w-full">
       {label && (
-        <label className="mb-1.5 block text-sm font-medium text-slate-700">
+        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
           {label}
         </label>
       )}
       <input
         type={type}
-        className={`w-full rounded-xl border px-4 py-2.5 text-sm text-slate-800 outline-none transition focus:ring-2 ${
+        className={`w-full rounded border bg-surface-container-low px-4 py-2.5 text-sm text-on-surface outline-none transition focus:ring-2 ${
           error
-            ? "border-red-400 focus:ring-red-200"
-            : "border-slate-300 focus:border-primary-500 focus:ring-primary-100"
+            ? "border-burgundy-400 focus:ring-burgundy-200"
+            : "border-outline-variant focus:border-brass-500 focus:ring-brass-100"
         }`}
         {...registration}
         {...rest}
       />
-      {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}
+      {error && <p className="mt-1.5 text-xs text-burgundy-500">{error}</p>}
     </div>
   );
 }

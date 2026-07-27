@@ -2,24 +2,24 @@ export default function Textarea({ label, error, rows = 4, registration, helperT
   return (
     <div>
       {label && (
-        <label className="mb-1.5 block text-sm font-medium text-slate-700">
+        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
           {label}
         </label>
       )}
       <textarea
         rows={rows}
-        className={`w-full resize-none rounded-xl border px-4 py-2.5 text-sm text-slate-800 outline-none focus:ring-2 ${
+        className={`w-full resize-none rounded border bg-surface-container-low px-4 py-2.5 text-sm text-on-surface outline-none focus:ring-2 ${
           error
-            ? "border-red-400 focus:ring-red-200"
-            : "border-slate-300 focus:border-primary-500 focus:ring-primary-100"
+            ? "border-burgundy-400 focus:ring-burgundy-200"
+            : "border-outline-variant focus:border-brass-500 focus:ring-brass-100"
         }`}
         {...registration}
         {...rest}
       />
       {error ? (
-        <p className="mt-1.5 text-xs text-red-500">{error}</p>
+        <p className="mt-1.5 text-xs text-burgundy-500">{error}</p>
       ) : (
-        helperText && <p className="mt-1.5 text-xs text-slate-400">{helperText}</p>
+        helperText && <p className="mt-1.5 text-xs text-on-surface-variant">{helperText}</p>
       )}
     </div>
   );

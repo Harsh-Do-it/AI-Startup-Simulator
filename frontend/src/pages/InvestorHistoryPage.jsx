@@ -6,6 +6,7 @@ import Badge from "../components/ui/Badge.jsx";
 import Skeleton from "../components/ui/Skeleton.jsx";
 import ErrorState from "../components/ui/ErrorState.jsx";
 import EmptyState from "../components/ui/EmptyState.jsx";
+import Button from "../components/ui/Button.jsx";
 import investorService from "../services/investorService.js";
 
 const scoreTone = (s) => (s >= 75 ? "green" : s >= 50 ? "yellow" : "red");
@@ -55,22 +56,21 @@ export default function InvestorHistoryPage() {
     <div>
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-100 text-primary-700">
+          <div className="flex h-12 w-12 items-center justify-center rounded bg-brass-50 text-brass-700">
             <History size={24} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Investor History</h1>
-            <p className="text-sm text-slate-500">
+            <h1 className="font-headline text-2xl font-bold text-ink-900">Investor History</h1>
+            <p className="text-sm text-on-surface-variant">
               Review all your past investor sessions and verdicts.
             </p>
           </div>
         </div>
-        <Link
-          to="/investor-room"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white"
-        >
-          <Users size={16} />
-          New Session
+        <Link to="/investor-room">
+          <Button variant="primary" className="gap-2">
+            <Users size={16} />
+            New Session
+          </Button>
         </Link>
       </div>
 
@@ -80,11 +80,8 @@ export default function InvestorHistoryPage() {
           title="No investor sessions yet"
           description="Enter the Investor Room to pitch your startup to an AI investor panel."
           action={
-            <Link
-              to="/investor-room"
-              className="rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white"
-            >
-              Enter Investor Room
+            <Link to="/investor-room">
+              <Button variant="primary">Enter Investor Room</Button>
             </Link>
           }
         />
@@ -106,13 +103,13 @@ export default function InvestorHistoryPage() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                whileHover={{ y: -4 }}
-                className="flex flex-col rounded-2xl border border-slate-100 bg-white p-5 shadow-card"
+                whileHover={{ y: -4, boxShadow: "var(--shadow-card)" }}
+                className="dossier-card flex flex-col p-5 paper-grain"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="font-semibold text-slate-900">{startupName}</h3>
-                    <p className="mt-1 text-sm text-slate-500">{industry}</p>
+                    <h3 className="font-headline font-semibold text-ink-900">{startupName}</h3>
+                    <p className="mt-1 text-sm font-semibold uppercase tracking-wider text-xs text-on-surface-variant">{industry}</p>
                   </div>
                   <Badge tone={isCompleted ? "green" : "yellow"}>
                     {isCompleted ? "Completed" : "In Progress"}
@@ -120,10 +117,10 @@ export default function InvestorHistoryPage() {
                 </div>
 
                 {isCompleted && session.overallScore !== null && (
-                  <div className="mt-3 flex items-center gap-3">
-                    <div className="flex items-center gap-1.5">
-                      <Trophy size={14} className="text-amber-500" />
-                      <span className="text-sm font-semibold">
+                  <div className="mt-4 flex items-center gap-3">
+                    <div className="flex items-center gap-1.5 rounded border border-brass-200 bg-brass-50 px-2.5 py-1">
+                      <Trophy size={14} className="text-brass-600" />
+                      <span className="font-data text-sm font-bold text-ink-900">
                         {session.overallScore}/100
                       </span>
                     </div>
@@ -135,19 +132,19 @@ export default function InvestorHistoryPage() {
                   </div>
                 )}
 
-                <p className="mt-3 flex items-center gap-1.5 text-xs text-slate-400">
+                <p className="mt-4 flex items-center gap-1.5 text-xs text-on-surface-variant">
                   <Calendar size={13} />
                   {date}
                 </p>
 
-                <p className="mt-1 text-xs text-slate-400">
+                <p className="mt-1 text-xs text-on-surface-variant">
                   {session.answers?.length || 0}/{session.questions?.length || 10} questions answered
                 </p>
 
-                <div className="mt-4">
+                <div className="mt-5">
                   <Link
                     to={`/investor-session/${session._id}`}
-                    className="flex items-center justify-center gap-1.5 rounded-xl bg-primary-600 px-3 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+                    className="flex w-full items-center justify-center gap-1.5 rounded bg-ink-800 px-3 py-2 text-sm font-semibold text-surface hover:bg-ink-700 transition-colors"
                   >
                     View Details
                     <ArrowRight size={14} />

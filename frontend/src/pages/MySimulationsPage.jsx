@@ -7,6 +7,7 @@ import Skeleton from "../components/ui/Skeleton.jsx";
 import EmptyState from "../components/ui/EmptyState.jsx";
 import ErrorState from "../components/ui/ErrorState.jsx";
 import ConfirmDialog from "../components/ui/ConfirmDialog.jsx";
+import Button from "../components/ui/Button.jsx";
 import simulationService from "../services/simulationService.js";
 
 export default function MySimulationsPage() {
@@ -53,17 +54,16 @@ export default function MySimulationsPage() {
     <div>
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold">My Simulations</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="font-headline text-2xl font-bold text-ink-900">My Simulations</h1>
+          <p className="mt-1 text-sm text-on-surface-variant">
             All your AI-generated startup evaluations in one place.
           </p>
         </div>
-        <Link
-          to="/simulations/new"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white"
-        >
-          <PlusCircle size={16} />
-          New Simulation
+        <Link to="/simulations/new">
+          <Button variant="primary" className="gap-2">
+            <PlusCircle size={16} />
+            New Simulation
+          </Button>
         </Link>
       </div>
 
@@ -91,11 +91,8 @@ export default function MySimulationsPage() {
           title="No simulations yet"
           description="Run your first AI startup simulation to get a venture-capital grade analysis."
           action={
-            <Link
-              to="/simulations/new"
-              className="rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white"
-            >
-              New Simulation
+            <Link to="/simulations/new">
+              <Button variant="primary">New Simulation</Button>
             </Link>
           }
         />

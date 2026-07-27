@@ -4,7 +4,7 @@ import Footer from "./Footer.jsx";
 
 export default function GuestLayout() {
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-surface">
       <Navbar variant="guest" />
       <main className="flex-1">
         <Outlet />
