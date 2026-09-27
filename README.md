@@ -299,3 +299,5 @@ Guided by institutional feedback and ongoing architectural refinement, planned e
 
 * **Defense & Demonstration:** Designed and developed as a comprehensive MERN stack capstone software engineering project for institutional defense and faculty panel evaluation.
 * **License:** Distributed under the MIT License. See `LICENSE` for information.
+
+# AI-Startup-Simulator
